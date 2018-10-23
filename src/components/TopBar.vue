@@ -2,8 +2,9 @@
     <div ref="top-bar" id="top-bar" class="shadow">
         <img src="../assets/logo.png" ref="logo" id="logo"/>
         <nav>
-            <a href="#" v-for="(item, idx) in menuItems" :key="idx" v-on:click="goToPage(idx)">{{item}}</a>
+            <a href="#" v-for="(item, idx) in menuItems" :key="idx" v-on:click="goToColumn(idx)">{{item}}</a>
         </nav>
+
     </div>
 </template>
 
@@ -16,8 +17,8 @@
             }
         },
         methods: {
-            goToPage(idx) {
-                this.$emit('listenToGoToPageEvent', idx);
+            goToColumn(idx) {
+                this.$emit('listenToGoToColumnEvent', idx);
             }
         }
     }
@@ -30,7 +31,7 @@
         display: inline-block;
         top: 0;
         width: 100%;
-        height: 35px;
+        height: 40px;
         background: #003366;
         padding-top: 5px;
         padding-left: 20px;
@@ -51,11 +52,12 @@
     nav {
         float: left;
         display: inline-block;
-        height: 35px;
+        height: 30px;
     }
 
     nav a {
-        color: #FFFFFF;
+        color: white !important;
+        font-size: medium;
         position: relative;
         top: 7px;
         line-height: 1;
