@@ -2,7 +2,7 @@
     <div id="container" ref="container">
         <div id="description">
             <img src="../assets/logo.png"/>
-            <div style="font-size: xx-large;">超傻逼的小型项目管理工具</div>
+            <div style="font-size: xx-large; margin-top: 10px">超轻的小型项目管理工具</div>
         </div>
         <div id="user-panel" class="shadow">
             <md-progress-bar md-mode="indeterminate" v-if="sending"/>

@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "vue": "^2.5.17",
+    "vue-letter-avatar": "^0.1.6",
     "vue-material": "^1.0.0-beta-10.2",
     "vuelidate": "^0.7.4"
   },

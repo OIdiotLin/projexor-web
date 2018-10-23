@@ -5,10 +5,13 @@
         </home-page>
         <div v-if="stage === 1">
             <top-bar v-on:listenToGoToPageEvent="goToPage"
-                     v-on:listenToGoToColumnEvent="goToColumn"
+                     v-on:listenToGoToFrameEvent="goToFrame"
                      style="min-width: 750px;"/>
             <div ref="content" class="content">
-
+                <timeline-frame v-if="frame === 0"/>
+                <task-frame v-if="frame === 1"/>
+                <resource-page v-if="frame === 2"/>
+                <member-frame v-if="frame === 3"/>
             </div>
         </div>
     </div>
@@ -23,25 +26,29 @@
 
     import TopBar from "./components/TopBar";
     import HomePage from "./components/HomePage";
+    import TimelineFrame from "./components/TimelineFrame";
+    import TaskFrame from "./components/TaskFrame";
+    import ResourcePage from "./components/ResourceFrame";
+    import MemberFrame from "./components/MemberFrame";
 
 
     export default {
         name: 'app',
-        components: {HomePage, TopBar},
+        components: {MemberFrame, ResourcePage, TaskFrame, TimelineFrame, HomePage, TopBar},
         data: function () {
             return {
-                stage: 1,   // 0 for login page, 1 for columns
-                contentShow: null
+                stage: 0,   // 0 for login page, 1 for columns
+                frame: 0,
             }
         },
         methods: {
             goToPage(idx) {
                 console.log('go to ' + idx);
                 this.stage = idx;
-                this.contentShow = idx;
             },
-            goToColumn(idx) {
-                console.log('go to column ' + idx);
+            goToFrame(idx) {
+                console.log('go to frame ' + idx);
+                this.frame = idx;
             }
         }
     }
@@ -69,9 +76,10 @@
 
     .content {
         position: fixed;
-        top: 35px;
+        top: 40px;
         width: 100%;
         min-height: 100%;
+        overflow-y: auto;
         background-color: floralwhite;
     }
 </style>

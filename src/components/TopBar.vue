@@ -2,7 +2,7 @@
     <div ref="top-bar" id="top-bar" class="shadow">
         <img src="../assets/logo.png" ref="logo" id="logo"/>
         <nav>
-            <a href="#" v-for="(item, idx) in menuItems" :key="idx" v-on:click="goToColumn(idx)">{{item}}</a>
+            <a href="#" v-for="(item, idx) in menuItems" :key="idx" v-on:click="goToFrame(idx)">{{item}}</a>
         </nav>
 
     </div>
@@ -13,12 +13,12 @@
         name: "TopBar",
         data() {
             return {
-                menuItems: ['首页', '任务', '资源', '成员']
+                menuItems: ['动态', '任务', '资源', '成员']
             }
         },
         methods: {
-            goToColumn(idx) {
-                this.$emit('listenToGoToColumnEvent', idx);
+            goToFrame(idx) {
+                this.$emit('listenToGoToFrameEvent', idx);
             }
         }
     }
