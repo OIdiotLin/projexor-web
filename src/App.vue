@@ -26,10 +26,10 @@
 
     import TopBar from "./components/TopBar";
     import HomePage from "./components/HomePage";
-    import TimelineFrame from "./components/TimelineFrame";
-    import TaskFrame from "./components/TaskFrame";
-    import ResourcePage from "./components/ResourceFrame";
-    import MemberFrame from "./components/MemberFrame";
+    import TimelineFrame from "./components/frames/TimelineFrame";
+    import TaskFrame from "./components/frames/TaskFrame";
+    import ResourcePage from "./components/frames/ResourceFrame";
+    import MemberFrame from "./components/frames/MemberFrame";
 
 
     export default {
@@ -63,6 +63,10 @@
         /*min-height: 800px;*/
     }
 
+    a {
+        text-decoration: none;
+    }
+
     #app {
         position: fixed;
         font-family: Helvetica, Tahoma, Arial, STXihei, “华文细黑”, “Microsoft YaHei”, “微软雅黑”, sans-serif;
@@ -75,11 +79,12 @@
     }
 
     .content {
-        position: fixed;
+        position: absolute;
         top: 40px;
         width: 100%;
         min-height: 100%;
-        overflow-y: auto;
         background-color: floralwhite;
+        padding-left: 30px;
+        padding-right: 30px;
     }
 </style>
