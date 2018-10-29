@@ -1,6 +1,6 @@
 # projexor-web
 
-[![Build Status](https://travis-ci.com/OIdiotLin/projexor-web.svg?branch=master)](https://travis-ci.com/OIdiotLin/projexor-web)
+[![Build Status](https://travis-ci.org/OIdiotLin/projexor-web.svg?branch=master)](https://travis-ci.org/OIdiotLin/projexor-web)
 
 http://projexor.oidiotlin.com/
 
