@@ -1,5 +1,38 @@
 <template>
     <div>
+
+        <div>
+		<md-button class='left' v-text="btnText" @click="showToggle"></md-button>
+		<md-card v-show="isShow" class="task">
+            <md-card-header>
+                <div class="md-title inline add">新建任务</div>
+            <md-divider/>
+            </md-card-header>
+            <md-card-content>
+                <div>任务名称：
+                    <input v-model="title">
+                </div>
+                <div>任务截止日期：
+                    <input v-model="endDatetime">
+                </div>
+                <div>任务描述：
+                    <input v-model="content">
+                </div>
+                <div>关系人：
+                    <div>
+                    <div v-for="(v,i) in stakeholders" v-bind:key="i">
+                        <button v-if="i>0" @click="removeBlank(i)">-</button>
+                        <input v-model="stakeholders[i]">
+                        <button  @click="addBlank">+</button></div>
+                    </div>
+                </div>
+            </md-card-content>
+                <md-card-actions>
+                <md-button class="md-primary">创建</md-button>
+                </md-card-actions>
+		</md-card>
+        </div>
+
         <md-card v-for="(task, idx) in tasks" v-bind:key="idx" class="task">
             <md-card-header>
                 <div>
@@ -66,8 +99,33 @@
                     startDatetime: '19:25, October 21, 2018',
                     endDatetime: '22:00, October 21, 2018',
                     description: '数据库设计是指对于一个给定的应用环境，构造最优的数据库模式，建立数据库及其应用系统，使之能够有效地存储数据，满足各种用户的应用需求（信息要求和处理要求）。在数据库领域内，常常把使用数据库的各类系统统称为数据库应用系统。',
-                }]
+                }],
+                btnText: '新建任务',
+                isShow: false,
+                title: '',
+                content: '',
+                endDatetime: '',
+                stakeholders: ['']
             }
+        },
+        methods: {
+            showToggle:function(){
+				this.isShow = !this.isShow
+				// if(this.isShow){
+				// 	this.btnText = "隐藏"
+				// }else{
+				// 	this.btnText = "显示"
+				// }
+			},
+
+            addBlank:function(){
+                this.stakeholders.push('')
+            },
+
+            removeBlank:function(i){
+                this.stakeholders.splice(i, 1)
+            }
+            
         }
     }
 </script>
@@ -99,5 +157,13 @@
     .inline-right {
         display: inline;
         float: right;
+    }
+    
+    .add {
+        color: rgba(255, 0, 0, 0.658);
+    }
+
+    .left {
+        float: left;
     }
 </style>
