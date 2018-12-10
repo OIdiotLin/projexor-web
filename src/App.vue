@@ -10,8 +10,9 @@
             <div ref="content" class="content">
                 <timeline-frame v-if="frame === 0"/>
                 <task-frame v-if="frame === 1"/>
-                <resource-page v-if="frame === 2"/>
-                <member-frame v-if="frame === 3"/>
+                <issue-frame v-if="frame === 2"/>
+                <resource-page v-if="frame === 3"/>
+                <member-frame v-if="frame === 4"/>
             </div>
         </div>
     </div>
@@ -28,13 +29,14 @@
     import HomePage from "./components/HomePage";
     import TimelineFrame from "./components/frames/TimelineFrame";
     import TaskFrame from "./components/frames/TaskFrame";
+    import IssueFrame from "./components/frames/IssueFrame";
     import ResourcePage from "./components/frames/ResourceFrame";
     import MemberFrame from "./components/frames/MemberFrame";
 
 
     export default {
         name: 'app',
-        components: {MemberFrame, ResourcePage, TaskFrame, TimelineFrame, HomePage, TopBar},
+        components: {MemberFrame, ResourcePage, IssueFrame, TaskFrame, TimelineFrame, HomePage, TopBar},
         data: function () {
             return {
                 stage: 0,   // 0 for login page, 1 for columns
