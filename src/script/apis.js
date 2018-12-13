@@ -1,3 +1,5 @@
+var server = 'https://projexor.oidiotlin.com/api/v1'
 export const api = {
-    login: '/api/login',
+    login: server + '/users/login/',
+    project_get: server + '/projects/'
 };

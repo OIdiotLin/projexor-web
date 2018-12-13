@@ -1,7 +1,8 @@
 <template>
     <div id="app">
         <home-page v-if="stage === 0"
-                   v-on:listenToGoToPageEvent="goToPage">
+                   v-on:listenToGoToPageEvent="goToPage"
+                   v-on:listenToGetProjectsEvent="getProjects">
         </home-page>
         <div v-if="stage === 1">
             <top-bar v-on:listenToGoToPageEvent="goToPage"
@@ -22,6 +23,7 @@
 
     import Vue from 'vue';
     import VueMaterial from 'vue-material';
+    import axios from 'axios'
 
     Vue.use(VueMaterial);
 
@@ -32,6 +34,7 @@
     import IssueFrame from "./components/frames/IssueFrame";
     import ResourcePage from "./components/frames/ResourceFrame";
     import MemberFrame from "./components/frames/MemberFrame";
+    import {api} from './script/apis'
 
 
     export default {
@@ -41,9 +44,28 @@
             return {
                 stage: 0,   // 0 for login page, 1 for columns
                 frame: 0,
+                userId : null,
+                projects: null
             }
         },
         methods: {
+            getProjects(userId, token) {
+                this.userId = userId
+                axios.get(api.project_get, {
+                    params: {
+                        'user__id': userId
+                    }, 
+                    headers: {
+                        'Authorization': 'JWT ' + token
+                    }
+                })
+                .then((response) => {
+                    console.log(response)
+                    this.projects = response.data.id
+                })
+                // console.log(this.projects)
+
+            },
             goToPage(idx) {
                 console.log('go to ' + idx);
                 this.stage = idx;

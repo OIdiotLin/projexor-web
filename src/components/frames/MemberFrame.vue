@@ -55,10 +55,12 @@
                 <md-button class="md-primary">修改</md-button>
             </md-card-actions>
         </md-card>
+        <div>{{ info }}</div>
     </div>
 </template>
 
 <script>
+    import axios from 'axios'
     export default {
         name: "MemberFrame", 
         data() {
@@ -88,17 +90,13 @@
                 btnText:"添加",
                 isShow:false,
                 job_list: [''],
-                userID: ''
+                userID: '',
+                info: null
             }
         },
         methods: {
             showToggle:function(){
 				this.isShow = !this.isShow
-				// if(this.isShow){
-				// 	this.btnText = "隐藏"
-				// }else{
-				// 	this.btnText = "显示"
-				// }
 			},
 
             addBlank:function(){
@@ -108,8 +106,11 @@
             removeBlank:function(i){
                 this.job_list.splice(i, 1)
             }
-            
-        } 
+        },
+        mounted () {
+            axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
+            .then(response => (this.info = response.data.bpi.USD))
+        }
     }
 </script>
 

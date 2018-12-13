@@ -31,7 +31,7 @@
                     <md-card-actions>
                         <md-button class="md-primary" :disabled="sending" v-on:click="loginStage=false">注册新用户
                         </md-button>
-                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="login">登录
+                        <md-button type="submit" class="md-primary" :disabled="sending" @click="login" @click.prevent>登录
                         </md-button>
                     </md-card-actions>
 
@@ -74,7 +74,7 @@
 
                     <md-card-actions>
                         <md-button class="md-primary" :disabled="sending" v-on:click="loginStage=true">我已有账户</md-button>
-                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="login">注册
+                        <md-button type="submit" class="md-primary" :disabled="sending">注册
                         </md-button>
                     </md-card-actions>
 
@@ -90,10 +90,10 @@
 
 <script>
     // import Vue from 'vue';
-    // import axios from 'axios';
+    import axios from 'axios';
     import {validationMixin} from 'vuelidate';
     import {required, email} from 'vuelidate/lib/validators';
-    // import {api} from '../script/apis'
+    import {api} from '../script/apis'
 
     import 'vue-material/dist/vue-material.min.css'
 
@@ -104,6 +104,8 @@
         mixins: [validationMixin],
         data() {
             return {
+                user: null,
+                token: null,
                 loginStage: true,
                 loginForm: {
                     account: null,
@@ -142,18 +144,43 @@
             }
         },
         methods: {
-            login: function () {
-                this.sending = true;
-                setTimeout(() => {
-                    this.sending = false;
-                    this.loginSuccess = true;
+            // login: function () {
+            //     this.sending = true;
+            //     setTimeout(() => {
+            //         this.sending = false;
+            //         this.loginSuccess = true;
 
-                    if (this.loginSuccess) {
-                        console.log('emit to listenToGoToPageEvent');
-                        this.$emit('listenToGoToPageEvent', 1);
-                    }
-                }, 1500);
-                // this.loginSuccess = false;
+            //         if (this.loginSuccess) {
+            //             console.log('emit to listenToGoToPageEvent');
+            //             this.$emit('listenToGoToPageEvent', 1);
+            //         }
+            //     }, 1500);
+            //     // this.loginSuccess = false;
+            // }
+            login: function () {
+                this.account = document.getElementById("account").value
+                this.password = document.getElementById("password").value
+
+                axios.post(api.login, {
+                    username: this.account,
+                    password: this.password
+                })
+                .then((response) => {
+                    this.user = response.data.user
+                    this.token = response.data.token
+                    console.log(this.user.id)
+                    console.log('user ' + this.user.id + ' login success!\nemit to listenToGetProjectsEvent')
+                    setTimeout(() => {
+                        this.$emit('listenToGetProjectsEvent', this.user.id, this.token)
+                    }, 1500)
+                    // this.$emit('listenToGoToPageEvent', 1)
+                })
+                .catch(function (error) {
+                    console.log(error)
+                    console.log('login unsuccess!')
+                    alert('登录失败')
+                }) 
+                
             }
         }
     }
