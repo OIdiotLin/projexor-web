@@ -28,85 +28,88 @@
                         <md-icon class="md-size-2x" style="color: limegreen;">check_circle</md-icon>
                 </div>
                 <div>
-                    <a href="#" class="inline emphasize">{{issue.username}}</a> 
+                    <a href="#" class="inline emphasize">{{issue.user.username}}</a> 
                     发表于 
-                    <div class="inline darkgray">{{issue.datetime}}</div>
+                    <div class="inline darkgray">{{issue.time}}</div>
                 </div>
             <md-divider/>
             </md-card-header>
             <md-card-content>
                 {{issue.content}}
             </md-card-content>
-            <md-card v-for="(reply, idx) in issue.replies" v-bind:key="idx" class="reply">
+            <reply-card v-bind:issue="issue"></reply-card>
+            <md-card v-if="modify==idx" class="reply">
+                <md-card-header>
+                <div class="md-title inline">回复内容</div>
                 <md-divider/>
-                <md-card-content>
-                    {{reply.content}}
-                    <div>
-                    <a href="#" class="inline emphasize">{{reply.username}}</a> 
-                    发表于 
-                    <div class="inline darkgray">{{reply.datetime}}</div>
-                    </div>
-                </md-card-content>
+                </md-card-header>
+                <textarea class="addrep" v-model="pre_reply"/>
+            <md-card-actions>
+                <md-button class="md-accent" v-on:click="quit">放弃编辑</md-button>
+                <md-button class="md-primary">确认回复</md-button>
+            </md-card-actions>
             </md-card>
             <md-card-actions>
-                <md-button v-if="!issue.closed" class="md-primary">回复</md-button>
+                <md-button v-if="modify!=idx"  class="md-primary" v-on:click="createReply(idx)">回复</md-button>
             </md-card-actions>
         </md-card>
     </div>
 </template>
 
 <script>
+    import axios from 'axios'
+    import { api } from '../../script/apis';
+    import Vue from 'vue'
+    import VueCookies from 'vue-cookies'
+    import ReplyCard from '../cards/ReplyCard'
+
+    Vue.use(VueCookies)
 
     export default {
         name: "IssueFrame",
         data() {
             return {
-                issues: [{
-                    closed: false,
-                    username: '黄文禹',
-                    title: '什么时候开会？',
-                    content: '什么时候开会？',
-                    datetime: '23:46, October 21, 2018',
-                    replies: [{
-                        username: '林会东',
-                        content: '今晚吧',
-                        datetime: '23:49, October 21, 2018',
-                    }, {
-                        username: '宗文智',
-                        content: '明晚吧',
-                        datetime: '23:51, October 21, 2018',
-                    }, {
-                        username: '李榷基',
-                        content: 'lmmnb！',
-                        datetime: '23:53, October 21, 2018',
-                    }, ]
-                }, {
-                    closed: false,
-                    username: '宗文智',
-                    title: 'vue怎么用？',
-                    content: 'vue怎么用？\n急，在线等。',
-                    datetime: '23:46, October 21, 2018'
-                }, {
-                    closed: true,
-                    username: '李榷基',
-                    title: '今晚吃什么？',
-                    content: '今晚吃什么？',
-                    datetime: '23:46, October 21, 2018'
-                }, {
-                    closed: true,
-                    username: '于竞超',
-                    title: '谁去拿外卖？',
-                    content: '谁去拿外卖？',
-                    datetime: '23:46, October 21, 2018'
-                },],
+                issues: null,
                 btnText: '发帖',
-                isShow: false
+                isShow: false,
+                pre_reply: '',
+                modify: -1
             }
+        },
+        props: {
+            projectId: null
+        },
+        mounted() {
+            this.getIssues()
         },
         methods: {
             showToggle:function(){
                 this.isShow = !this.isShow
+            },
+            getIssues:function(){
+                axios.get(api.issue_get, {
+                    headers: {'Authorization': this.$cookies.get('JWT')},
+                    params: {'project_id': this.projectId}
+                })
+                .then((response) => {
+                    this.issues = response.data 
+                    console.log(this.issues)
+                })
+            },
+            created:function(pid){
+                this.issues = null
+                this.projectId = pid
+                this.getIssues()
+            },
+            createReply:function(idx) {
+                this.modify = idx
+            },
+            quit:function() {
+                this.modify = -1
             }
+        },
+        components: {
+            ReplyCard
         }
     }
 </script>
@@ -161,6 +164,13 @@
 
     .add {
         color: rgba(255, 0, 0, 0.658);
+    }    
+    .addrep {
+        width: 95%;
+        height: 100px;
+        overflow: auto;
+        word-break: break-all;
+        margin: 15px;
     }
 
 </style>
