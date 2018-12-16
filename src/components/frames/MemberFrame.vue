@@ -8,15 +8,7 @@
             </md-card-header>
             <md-card-content>
                 <div>成员ID：
-                    <input v-model="userID">
-                </div>
-                <div>职责：
-                    <div>
-                    <div v-for="(v,i) in job_list" v-bind:key="i">
-                        <button v-if="i>0" @click="removeBlank(i)">-</button>
-                        <input v-model="job_list[i]">
-                        <button  @click="addBlank">+</button></div>
-                    </div>
+                    <input class="wid" v-model="userID">
                 </div>
             </md-card-content>
                 <md-card-actions>
@@ -25,80 +17,54 @@
 		</md-card>
         </div>
         <md-card v-for="(member, idx) in members" v-bind:key="idx" class="member">
-            <md-card-header>
-                <div v-if="member.pm" class="md-title inline pm">{{member.name}}</div>
-                <div v-else class="md-title inline">{{member.name}}</div>
-                <div v-if="member.pm" class="md-title inline-right pm">
-                        PM
-                    </div>
-                <div>
-                        加入于
-                        <div class="inline darkgray">{{member.joinDatatune}}</div>
-                    </div>
-            <md-divider/>
-            </md-card-header>
-            
-            <md-card-content>
-                <div>职责：<a href="#" class="emphasize" style="margin-right: 4px;"
-                            v-for="(name,idx) in member.position"
-                            v-bind:key="idx">{{name}}</a></div>
-                <!-- <div>当前任务：<a href="#" class="emphasize" style="margin-right: 4px;"
-                            v-for="(name,idx) in member.tasks"
-                            v-bind:key="idx">{{name}}</a></div> -->
-                <div>当前任务：<div class="emphasize" style="margin-right: 4px;"
-                            v-for="(name,idx) in member.tasks"
-                            v-bind:key="idx">  {{idx+1}}. <a href="#">{{member.tasks[idx]}}</a><br/>截止时间: {{member.endDatetime[idx]}}</div></div>
-            </md-card-content>
-            
-            <md-card-actions>
-                <md-button class="md-accent">删除</md-button>
-                <md-button class="md-primary">修改</md-button>
-            </md-card-actions>
+            <member-card v-bind:member="member"></member-card>
         </md-card>
     </div>
 </template>
 
 <script>
+    import axios from 'axios'
+    import { api } from '../../script/apis';
+    import MemberCard from '../cards/MemberCard'
+    import Vue from 'vue'
+    import VueCookies from 'vue-cookies'
+
+    Vue.use(VueCookies)
+
     export default {
         name: "MemberFrame", 
         data() {
             return {
-                members: [{
-                    name: '宗文智',
-                    pm: true,
-                    position: ['项目经理', '架构设计'],
-                    tasks: ['UI原型设计'],
-                    endDatetime: ['23:46, October 21, 2018'], 
-                    joinDatatune: '13:23, July 17, 2018'
-                }, {
-                    name: '黄文禹',
-                    pm: false,
-                    position: ['前端开发', '架构设计'],
-                    tasks: ['系统概要设计'],
-                    endDatetime: ['23:46, October 21, 2018'], 
-                    joinDatatune: '22:57, July 21, 2018'
-                }, {
-                    name: '林会东',
-                    pm: false,
-                    position: ['前端开发', '后台设计'],
-                    tasks: ['UI原型设计', '系统概要设计'],
-                    endDatetime: ['23:46, October 21, 2018', '23:46, October 21, 2018'], 
-                    joinDatatune: '23:46, July 21, 2018'
-                }],
+                members: null,
+                tasks: new Array(),
                 btnText:"添加",
                 isShow:false,
                 job_list: [''],
-                userID: ''
+                userID: '',
+                info: null
             }
         },
+        props: {
+            projectId: null
+        },
+        mounted() {
+            this.getMembers()
+        },
         methods: {
+            getMembers:function() {
+                axios.get(api.member_get, {
+                    headers: {'Authorization': this.$cookies.get('JWT')},
+                    params: {'id': this.projectId}
+                })
+                .then ((response) => {
+                    this.members = response.data[0].users
+                    for (var i = 0; i < this.members.length; i++) {
+                        this.$ref.i.getTasks()
+                    }
+                })
+            },
             showToggle:function(){
-				this.isShow = !this.isShow
-				// if(this.isShow){
-				// 	this.btnText = "隐藏"
-				// }else{
-				// 	this.btnText = "显示"
-				// }
+                this.isShow = !this.isShow
 			},
 
             addBlank:function(){
@@ -107,9 +73,16 @@
 
             removeBlank:function(i){
                 this.job_list.splice(i, 1)
-            }
-            
-        } 
+            },
+            created(pid) {
+                this.members = null
+                this.projectId = pid
+                this.getMembers()
+            },
+        },
+        components: {
+            MemberCard
+        }
     }
 </script>
 
@@ -152,5 +125,9 @@
 
     .left {
         float: left;
+    }
+
+    .wid {
+        width: 100%;
     }
 </style>

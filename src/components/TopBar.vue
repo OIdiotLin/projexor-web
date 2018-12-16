@@ -1,10 +1,11 @@
 <template>
     <div ref="top-bar" id="top-bar" class="shadow">
-        <img src="../assets/logo.png" ref="logo" id="logo"/>
+        <a v-on:click="goToFrame(5)"><img src="../assets/logo.png" ref="logo" id="logo"/></a>
         <nav>
             <a href="#" v-for="(item, idx) in menuItems" :key="idx" v-on:click="goToFrame(idx)">{{item}}</a>
-            <select v-model="selected" class="select">
-            <option v-for="(project, idx) in projects" :key="idx" >{{project.name}}</option>
+            <button class="create" v-on:click="createProject">新建</button>
+            <select v-model="selected" class="select" v-on:change="changeProject()">
+            <option :value="project.id" v-for="(project, idx) in projects" :key="idx ">{{project.name}}</option>
             </select>
         </nav>
 
@@ -12,22 +13,52 @@
 </template>
 
 <script>
+    import axios from 'axios'
+    import { api } from '../script/apis';
+
     export default {
         name: "TopBar",
         data() {
             return {
                 menuItems: ['动态', '任务', '帖子', '资源', '成员'],
-                projects: [{
-                    name: "项目A"
-                }, {
-                    name: "项目B"
-                }]
+                selected: '',
+                curridx: null
             }
+        },
+        created() {
+            this.selected = this.projects[0].id
+            this.curridx = 1
+            this.goToFrame(1, this.selected)
         },
         methods: {
             goToFrame(idx) {
-                this.$emit('listenToGoToFrameEvent', idx);
+                this.curridx = idx
+                this.$emit('listenToGoToFrameEvent', idx, this.selected);
+            },
+            changeProject:function() {
+                this.goToFrame(this.curridx)
+            },
+            createProject:function() {
+                var project_name = prompt("请输入要创建的项目名",'');
+                axios.post(api.project, {
+                    name: project_name,
+                    users: this.user_id
+                }, {
+                    headers: {'Authorization': this.$cookies.get('JWT')}
+                })
+                .then((response) => {
+                    console.log(response)
+                    alert("创建成功")
+                })
+                .catch((error) => {
+                    console.log(error)
+                    alert("创建失败")
+                })
             }
+        },
+        props: {
+            projects: null,
+            user_id: null
         }
     }
 </script>
@@ -67,7 +98,7 @@
         color: white !important;
         font-size: medium;
         position: relative;
-        /* top: 7px; */
+        top: 7px;
         line-height: 1;
         text-decoration: none !important;
         font-weight: bold;
@@ -80,8 +111,19 @@
         color: rgb(0, 0, 0) !important;
         height: 30px;
         font-size: medium;
-        position: relative;
+        position: absolute;
         margin-left: 20px;
         margin-right: 20px;
+        right: 150px
+    }
+
+    .create{
+        color: rgb(0, 0, 0) !important;
+        height: 30px;
+        font-size: medium;
+        position: absolute;
+        margin-left: 20px;
+        margin-right: 20px;
+        right: 30px
     }
 </style>

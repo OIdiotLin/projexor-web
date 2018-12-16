@@ -15,7 +15,7 @@
                     <md-card-content>
                         <md-field>
                             <label for="account">用户名/电子邮箱</label>
-                            <md-input name="account" id="account" v-model="loginForm.account"></md-input>
+                            <md-input name="account" id="account" v-model="loginForm.account" ></md-input>
                             <span class="md-error" v-if="!$v.loginForm.account.required">请输入账户名或电子邮箱</span>
                         </md-field>
 
@@ -31,7 +31,7 @@
                     <md-card-actions>
                         <md-button class="md-primary" :disabled="sending" v-on:click="loginStage=false">注册新用户
                         </md-button>
-                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="login">登录
+                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="login" @click.prevent>登录
                         </md-button>
                     </md-card-actions>
 
@@ -74,7 +74,7 @@
 
                     <md-card-actions>
                         <md-button class="md-primary" :disabled="sending" v-on:click="loginStage=true">我已有账户</md-button>
-                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="login">注册
+                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="regist">注册
                         </md-button>
                     </md-card-actions>
 
@@ -90,10 +90,14 @@
 
 <script>
     // import Vue from 'vue';
-    // import axios from 'axios';
+    import axios from 'axios';
     import {validationMixin} from 'vuelidate';
     import {required, email} from 'vuelidate/lib/validators';
-    // import {api} from '../script/apis'
+    import {api} from '../script/apis'
+    import Vue from 'vue'
+    import VueCookies from 'vue-cookies'
+
+    Vue.use(VueCookies)
 
     import 'vue-material/dist/vue-material.min.css'
 
@@ -104,6 +108,8 @@
         mixins: [validationMixin],
         data() {
             return {
+                user: null,
+                token: null,
                 loginStage: true,
                 loginForm: {
                     account: null,
@@ -143,17 +149,49 @@
         },
         methods: {
             login: function () {
-                this.sending = true;
-                setTimeout(() => {
-                    this.sending = false;
-                    this.loginSuccess = true;
+                this.sending = true
+                var that = this;
 
-                    if (this.loginSuccess) {
-                        console.log('emit to listenToGoToPageEvent');
-                        this.$emit('listenToGoToPageEvent', 1);
-                    }
-                }, 1500);
-                // this.loginSuccess = false;
+                axios.post(api.login, {
+                    username: this.loginForm.account,
+                    password: this.loginForm.password
+                })
+                .then((response) => {
+                    this.user = response.data.user
+                    this.token = response.data.token
+                    this.$cookies.set('JWT', 'JWT ' + response.data.token)
+                    console.log(this.user.id)
+                    console.log('user ' + this.user.id + ' login success!\nemit to listenToGetProjectsEvent')
+                    this.$emit('listenToGetProjectsEvent', this.user.id, this.token)
+                    // this.$emit('listenToGoToPageEvent', 1)
+                })
+                .catch(function (error) {
+                    console.log(error)
+                    console.log('login unsuccess!')
+                    alert('登录失败')
+                    that.sending = false
+                }) 
+            },
+
+            regist: function () {
+                this.sending = true
+                var that = this;
+
+                axios.post(api.regist, {
+                    username: this.registForm.username,
+                    email: this.registForm.email,
+                    password: this.registForm.password
+                })
+                .then((response) => {
+                    console.log(response)
+                    alert("注册成功")
+                    that.sending = false
+                })
+                .catch(function (error) {
+                    console.log(error)
+                    alert('注册失败')
+                    that.sending = false
+                }) 
             }
         }
     }
