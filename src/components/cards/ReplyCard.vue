@@ -1,30 +1,30 @@
 <template>
     <div>
-            <md-card v-for="(reply, idx) in replies" v-bind:key="idx" class="reply">
-                <md-divider/>
-                <md-card-content>
-                    <div>
-                    <a href="#" class="inline emphasize">{{reply.user.username}}</a> 
-                    发表于 
+        <md-card v-for="(reply, idx) in replies" v-bind:key="idx" class="reply">
+            <md-divider/>
+            <md-card-content>
+                <div>
+                    <a href="#" class="inline emphasize">{{reply.user.username}}</a>
+                    发表于
                     <div class="inline darkgray">{{reply.time}}</div>
-                    </div>
-                    {{reply.content}}
-                </md-card-content>
-            </md-card>
+                </div>
+                {{reply.content}}
+            </md-card-content>
+        </md-card>
     </div>
 </template>
 
 
 <script>
     import axios from 'axios'
-    import { api } from '../../script/apis'
+    import {api} from '../../script/apis'
     import Vue from 'vue'
     import VueCookies from 'vue-cookies'
 
     Vue.use(VueCookies)
 
     export default {
-        name: "ReplyCard", 
+        name: "ReplyCard",
         props: {
             issue: null,
         },
@@ -37,13 +37,14 @@
             }
         },
         methods: {
-            getReplies:function() {
-                axios.get(api.reply_get, {
+            getReplies: function () {
+                axios.get(api.reply(), {
                     headers: {'Authorization': this.$cookies.get('JWT')},
                     params: {'post__id': this.issue.id}
-                })
-                .then ((response) => {
-                    this.replies = response.data
+                }).then((response) => {
+                    this.replies = response.data;
+                    this.replies.sort((a, b) => a.time - b.time);
+                    console.log(this.replies)
                 })
             },
         }
@@ -78,7 +79,7 @@
         max-width: 800px;
         min-width: 550px;
     }
-    
+
     .reply {
         position: relative;
         margin: 30px auto;

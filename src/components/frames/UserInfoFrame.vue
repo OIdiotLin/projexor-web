@@ -60,9 +60,9 @@
         },
         methods: {
             getInfo:function() {
-                axios.get(api.user, {
+                axios.get(api.user(this.userId), {
                     headers: {'Authorization': this.$cookies.get('JWT')},
-                    params: {'id': this.user_id}
+                    // params: {'id': this.user_id}
                 })
                 .then ((response) => {
                     this.info = response.data[0]

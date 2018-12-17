@@ -116,7 +116,7 @@
         },
         methods: {
             getResources:function() {
-                axios.get(api.resource, {
+                axios.get(api.resource(), {
                     headers: {'Authorization': this.$cookies.get('JWT')},
                     params: {'project_id': this.projectId}
                 })
@@ -136,7 +136,7 @@
             },
 
             addResources:function() {
-                // axios.get(api.member_get, {
+                // axios.get(api.member, {
                 //     headers: {'Authorization': this.$cookies.get('JWT')},
                 //     params: {'id': this.projectId}
                 // })

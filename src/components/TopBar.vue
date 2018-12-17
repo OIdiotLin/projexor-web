@@ -1,11 +1,11 @@
 <template>
     <div ref="top-bar" id="top-bar" class="shadow">
-        <a v-on:click="goToFrame(5)"><img src="../assets/logo.png" ref="logo" id="logo"/></a>
+        <a v-on:click="goToFrame(4)"><img src="../assets/logo.png" ref="logo" id="logo"/></a>
         <nav>
             <a href="#" v-for="(item, idx) in menuItems" :key="idx" v-on:click="goToFrame(idx)">{{item}}</a>
             <button class="create" v-on:click="createProject">新建</button>
             <select v-model="selected" class="select" v-on:change="changeProject()">
-            <option :value="project.id" v-for="(project, idx) in projects" :key="idx ">{{project.name}}</option>
+                <option :value="project.id" v-for="(project, idx) in projects" :key="idx ">{{project.name}}</option>
             </select>
         </nav>
 
@@ -14,46 +14,46 @@
 
 <script>
     import axios from 'axios'
-    import { api } from '../script/apis';
+    import {api} from '../script/apis';
 
     export default {
         name: "TopBar",
         data() {
             return {
-                menuItems: ['动态', '任务', '帖子', '资源', '成员'],
+                menuItems: ['任务', '帖子', '资源', '成员'],
                 selected: '',
                 curridx: null
             }
         },
         created() {
             this.selected = this.projects[0].id
-            this.curridx = 1
-            this.goToFrame(1, this.selected)
+            this.curridx = 0
+            this.goToFrame(0, this.selected)
         },
         methods: {
             goToFrame(idx) {
                 this.curridx = idx
                 this.$emit('listenToGoToFrameEvent', idx, this.selected);
             },
-            changeProject:function() {
+            changeProject: function () {
                 this.goToFrame(this.curridx)
             },
-            createProject:function() {
-                var project_name = prompt("请输入要创建的项目名",'');
+            createProject: function () {
+                var project_name = prompt("请输入要创建的项目名", '');
                 axios.post(api.project, {
                     name: project_name,
-                    users: this.user_id
+                    users: [this.user_id]
                 }, {
                     headers: {'Authorization': this.$cookies.get('JWT')}
                 })
-                .then((response) => {
-                    console.log(response)
-                    alert("创建成功")
-                })
-                .catch((error) => {
-                    console.log(error)
-                    alert("创建失败")
-                })
+                    .then((response) => {
+                        console.log(response)
+                        alert("创建成功")
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                        alert("创建失败")
+                    })
             }
         },
         props: {
@@ -107,7 +107,7 @@
         padding: 10px;
     }
 
-    .select{
+    .select {
         color: rgb(0, 0, 0) !important;
         height: 30px;
         font-size: medium;
@@ -117,7 +117,7 @@
         right: 150px
     }
 
-    .create{
+    .create {
         color: rgb(0, 0, 0) !important;
         height: 30px;
         font-size: medium;

@@ -52,7 +52,7 @@
         },
         methods: {
             getMembers:function() {
-                axios.get(api.member_get, {
+                axios.get(api.project(), {
                     headers: {'Authorization': this.$cookies.get('JWT')},
                     params: {'id': this.projectId}
                 })

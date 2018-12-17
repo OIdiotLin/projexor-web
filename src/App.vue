@@ -11,13 +11,11 @@
                      v-bind:user_id="this.userId"
                      style="min-width: 750px;"/>
             <div ref="content" class="content">
-                <timeline-frame v-if="frame === 0" />
-                <task-frame ref="task" v-if="frame === 1" v-bind:project-id="this.currProjectId"/>
-                <issue-frame ref="issue" v-if="frame === 2" v-bind:project-id="this.currProjectId"/>
-                <resource-page ref="resource" v-if="frame === 3" v-bind:project-id="this.currProjectId"/>
-                <member-frame ref="member" v-if="frame === 4" v-bind:project-id="this.currProjectId"/>
-                <user-info-frame v-if="frame === 5" v-bind:user_id="this.userId"/>
-                
+                <task-frame ref="task" v-if="frame === 0" v-bind:project-id="this.currProjectId"/>
+                <issue-frame ref="issue" v-if="frame === 1" v-bind:project-id="this.currProjectId"/>
+                <resource-page ref="resource" v-if="frame === 2" v-bind:project-id="this.currProjectId"/>
+                <member-frame ref="member" v-if="frame === 3" v-bind:project-id="this.currProjectId"/>
+                <user-info-frame v-if="frame === 4" v-bind:user_id="this.userId"/>
             </div>
         </div>
     </div>
@@ -49,7 +47,7 @@
             return {
                 stage: 0,   // 0 for login page, 1 for columns
                 frame: 0,
-                userId : null,
+                userId: null,
                 projects: [],
                 currProjectId: null,
                 token: null,
@@ -57,47 +55,45 @@
         },
         methods: {
             getProjects(userId, token) {
-                this.userId = userId
-                this.token = token
-                axios.get(api.project, {
+                this.userId = userId;
+                this.token = token;
+                axios.get(api.project(), {
                     params: {
                         'users__id': userId
-                    }, 
+                    },
                     headers: {
                         'Authorization': 'JWT ' + token
                     }
                 })
-                .then((response) => {
-                    var data = response.data
-                    var x
-                    for (x in data) {
-                        this.projects.push(data[x])
-                    }
-                    this.goToPage(1)
-                })
-
+                    .then((response) => {
+                        const data = response.data;
+                        for (const x in data) {
+                            this.projects.push(data[x])
+                        }
+                        this.goToPage(1)
+                    })
             },
             goToPage(idx) {
-                console.log('go to ' + idx);
+                // console.log('go to ' + idx);
                 this.stage = idx;
             },
             goToFrame(idx, projId) {
-                console.log('go to frame ' + idx);
+                // console.log('go to frame ' + idx);
                 this.currProjectId = projId;
                 this.frame = idx;
                 switch (idx) {
                     case 1:
-                    this.$refs.task.created(projId)
-                    break
+                        this.$refs.task.created(projId);
+                        break;
                     case 2:
-                    this.$refs.issue.created(projId)
-                    break
+                        this.$refs.issue.created(projId);
+                        break;
                     case 3:
-                    this.$refs.resource.created(projId)
-                    break
+                        this.$refs.resource.created(projId);
+                        break;
                     case 4:
-                    this.$refs.member.created(projId)
-                    break
+                        this.$refs.member.created(projId);
+                        break;
                 }
             },
         }
