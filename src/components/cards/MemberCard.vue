@@ -56,7 +56,7 @@
             getTasks: function () {
                 axios.get(api.task(), {
                     headers: {'Authorization': this.$cookies.get('JWT')},
-                    params: {'users__id': this.member.id}
+                    params: {'users__id': this.member.id, 'project_id': this.$cookies.get('project_id')}
                 }).then((response) => {
                     this.tasks = response.data
                 })

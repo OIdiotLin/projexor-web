@@ -8,14 +8,14 @@
             <top-bar v-on:listenToGoToPageEvent="goToPage"
                      v-on:listenToGoToFrameEvent="goToFrame"
                      v-bind:projects="this.projects"
-                     v-bind:user_id="this.userId"
+                     v-bind:user_id="this.addingUsername"
                      style="min-width: 750px;"/>
             <div ref="content" class="content">
                 <task-frame ref="task" v-if="frame === 0" v-bind:project-id="this.currProjectId"/>
                 <issue-frame ref="issue" v-if="frame === 1" v-bind:project-id="this.currProjectId"/>
                 <resource-page ref="resource" v-if="frame === 2" v-bind:project-id="this.currProjectId"/>
                 <member-frame ref="member" v-if="frame === 3" v-bind:project-id="this.currProjectId"/>
-                <user-info-frame v-if="frame === 4" v-bind:user_id="this.userId"/>
+                <user-info-frame v-if="frame === 4" v-bind:user_id="this.addingUsername"/>
             </div>
         </div>
     </div>
@@ -47,7 +47,7 @@
             return {
                 stage: 0,   // 0 for login page, 1 for columns
                 frame: 0,
-                userId: null,
+                addingUsername: null,
                 projects: [],
                 currProjectId: null,
                 token: null,

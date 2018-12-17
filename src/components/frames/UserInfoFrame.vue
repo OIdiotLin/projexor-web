@@ -7,9 +7,9 @@
                         创建于
                         <div class="inline darkgray">{{resource.createDatatune}}</div>
                     </div> -->
-            <md-divider/>
+                <md-divider/>
             </md-card-header>
-            
+
             <md-card-content v-if="!modify">
                 <div>用户名：{{info.username}}</div>
                 <div>邮箱：{{info.email}}</div>
@@ -30,24 +30,24 @@
 </template>
 <script>
     import axios from 'axios'
-    import { api } from '../../script/apis';
+    import {api} from '../../script/apis';
     import Vue from 'vue'
     import VueCookies from 'vue-cookies'
 
-    Vue.use(VueCookies)
-    
+    Vue.use(VueCookies);
+
     export default {
-        name: "ResourcePage", 
+        name: "ResourcePage",
         data() {
             return {
                 info: null,
-                
+
                 btnText: '添加资源',
                 isShow: false,
                 modify: false,
                 modify_data: {
                     username: null,
-                    emial: null, 
+                    emial: null,
                 }
             }
         },
@@ -55,26 +55,25 @@
             user_id: null
         },
         mounted() {
-            this.info = null
+            this.info = null;
             this.getInfo()
         },
         methods: {
-            getInfo:function() {
-                axios.get(api.user(this.userId), {
+            getInfo: function () {
+                axios.get(api.user(this.addingUsername), {
                     headers: {'Authorization': this.$cookies.get('JWT')},
                     // params: {'id': this.user_id}
-                })
-                .then ((response) => {
+                }).then((response) => {
                     this.info = response.data[0]
                 })
             },
 
-            modifyInfo:function(){
-                this.modify = true
-                this.modify_data.username = this.info.username.concat()
+            modifyInfo: function () {
+                this.modify = true;
+                this.modify_data.username = this.info.username.concat();
                 this.modify_data.email = this.info.email.concat()
             },
-            quit:function(){
+            quit: function () {
                 this.modify = false
             }
         }

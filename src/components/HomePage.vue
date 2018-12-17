@@ -167,7 +167,7 @@
                         this.user = response.data.user
                         this.token = response.data.token
                         this.$cookies.set('JWT', 'JWT ' + response.data.token);
-                        this.$cookies.set('userId', this.user.id);
+                        this.$cookies.set('addingUsername', this.user.id);
                         this.$emit('listenToGetProjectsEvent', this.user.id, this.token)
                         // this.$emit('listenToGoToPageEvent', 1)
                     })

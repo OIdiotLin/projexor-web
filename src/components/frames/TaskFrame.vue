@@ -40,12 +40,12 @@
         </div>
 
         <md-card v-for="(task, idx) in tasks" v-bind:key="idx" class="task">
-            <div v-if="modify!=idx">
+            <div v-if="modify!==idx">
                 <md-card-header>
                     <div>
                         <div class="md-title inline">{{task.name}}</div>
                         <!-- <div class="md-title inline darkgray" style="margin-left: 10px;">#{{task.id}}</div> -->
-                        <div v-if="task.state!='R'" class="md-title inline-right">
+                        <div v-if="task.state!=='R'" class="md-title inline-right">
                             <md-icon class="md-size-2x" style="color: limegreen;">check_circle</md-icon>
                         </div>
                         <div>
@@ -66,7 +66,7 @@
                     {{task.description}}
                 </md-card-content>
             </div>
-            <div v-if="modify==idx">
+            <div v-if="modify===idx">
                 <md-card-content>
                     <div>任务名称：
                         <input class="wid" v-model="modify_data.name">
@@ -77,28 +77,23 @@
                     <div>任务描述：
                         <textarea class="description" v-model="modify_data.description"></textarea>
                     </div>
-                    <div>关系人：
-                        <div>
-                            <div v-for="(user,i) in modify_data.users" v-bind:key="i">
-                                <button @click="removeBlank(idx, i)">-</button>
-                                <input v-model="user.username">
-                                <button @click="addBlank(idx)">+</button>
-                            </div>
-                        </div>
+                    <div>
+                        <md-switch v-model="modify_state" class="md-primary" @change="toggleState">
+                            {{modify_data.state==='F'?"已经":"尚未"}}完成
+                        </md-switch>
                     </div>
                 </md-card-content>
             </div>
 
             <md-card-actions>
-                <md-button v-if="modify!=idx" class="md-accent" v-on:click="deletingTask(idx)" @click.prevent>删除
+                <md-button v-if="modify!==idx" class="md-accent" v-on:click="deletingTask(idx)" @click.prevent>删除
                 </md-button>
-                <md-button v-if="modify!=idx" class="md-primary" v-on:click="updatingTask(idx)">修改</md-button>
-                <md-button v-if="modify==idx" class="md-accent" v-on:click="quit">放弃修改</md-button>
-                <md-button v-if="modify==idx" class="md-primary" v-on:click="updateTask(idx)" @click.prevent>确认修改
+                <md-button v-if="modify!==idx" class="md-primary" v-on:click="updatingTask(idx)">修改</md-button>
+                <md-button v-if="modify===idx" class="md-accent" v-on:click="quit">放弃修改</md-button>
+                <md-button v-if="modify===idx" class="md-primary" v-on:click="updateTask(idx)" @click.prevent>确认修改
                 </md-button>
             </md-card-actions>
         </md-card>
-
 
     </div>
 </template>
@@ -135,8 +130,14 @@
                     name: '',
                     description: '',
                     end_time: '',
+                    state: 'R',
                     users: [],
                 }
+            }
+        },
+        computed: {
+            modify_state: function () {
+                return this.modify_data.state === 'F';
             }
         },
         props: {
@@ -147,6 +148,12 @@
             this.getUsers();
         },
         methods: {
+            toggleState: function () {
+                if (this.modify_data.state === 'F')
+                    this.modify_data.state = 'R';
+                else
+                    this.modify_data.state = 'F';
+            },
             getTasks: function () {
                 axios.get(api.task(), {
                     headers: {'Authorization': this.$cookies.get('JWT')},
@@ -166,8 +173,8 @@
             },
 
             addTask: function () {
-                var users_id = this.users.filter((x) => this.add_data.users.includes(x.username)).map(x => x.id);
-
+                var users_id = this.users.filter((x) => this.add_data.users.includes(x.username));
+                console.log(this.projectId);
                 axios.post(api.task(), {
                         project_id: this.projectId,
                         users: users_id,
@@ -177,6 +184,8 @@
                     }, {headers: {'Authorization': this.$cookies.get('JWT')}}
                 ).then((response) => {
                     console.log(response);
+                    this.showToggle();
+                    this.getTasks();
                 })
             },
 
@@ -200,7 +209,8 @@
                 this.modify_data.name = this.tasks[idx].name.concat();
                 this.modify_data.description = this.tasks[idx].description.concat();
                 this.modify_data.end_time = this.tasks[idx].end_time.concat();
-                this.modify_data.users = this.tasks[idx].users.concat()
+                this.modify_data.users = this.tasks[idx].users.concat();
+                this.modify_data.state = this.tasks[idx].state.concat();
                 console.log(this.modify_data.users)
             },
 
@@ -214,14 +224,18 @@
              **/
             updateTask: function (idx) {
                 let task_id = this.tasks[idx].id;
+                for (const user of this.modify_data.users.values())
+                    console.log(user);
                 axios.put(api.task(task_id), {
+                        id: task_id,
                         name: this.modify_data.name,
                         description: this.modify_data.description,
                         end_time: this.modify_data.end_time,
-                        users: this.users.filter((x) => this.modify_data.users.includes(x.username))
+                        state: this.modify_data.state
                     }, {headers: {'Authorization': this.$cookies.get('JWT')}}
                 ).then(() => {
                     this.created();
+                    this.quit();
                 })
             },
 

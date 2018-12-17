@@ -26,34 +26,34 @@
             }
         },
         created() {
-            this.selected = this.projects[0].id
-            this.curridx = 0
+            this.selected = this.projects[0].id;
+            this.curridx = 0;
             this.goToFrame(0, this.selected)
         },
         methods: {
             goToFrame(idx) {
-                this.curridx = idx
+                this.curridx = idx;
                 this.$emit('listenToGoToFrameEvent', idx, this.selected);
             },
             changeProject: function () {
+                this.$cookies.set('project_id', this.projects[this.curridx].id);
                 this.goToFrame(this.curridx)
             },
             createProject: function () {
                 var project_name = prompt("请输入要创建的项目名", '');
-                axios.post(api.project, {
+                axios.post(api.project(), {
                     name: project_name,
-                    users: [this.user_id]
+                    users: [{'id': this.user_id}]
                 }, {
                     headers: {'Authorization': this.$cookies.get('JWT')}
+                }).then((response) => {
+                    console.log(response);
+                    alert("创建成功");
+                    this.goToFrame(0);
+                }).catch((error) => {
+                    console.log(error);
+                    alert("创建失败")
                 })
-                    .then((response) => {
-                        console.log(response)
-                        alert("创建成功")
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                        alert("创建失败")
-                    })
             }
         },
         props: {

@@ -100,7 +100,7 @@
             },
             createIssue: function () {
                 axios.post(api.issue(), {
-                        user_id: this.$cookies.get('userId'),
+                        user_id: this.$cookies.get('addingUsername'),
                         project_id: this.projectId,
                         title: this.title,
                         content: this.content,
@@ -124,11 +124,12 @@
                 axios.post(api.reply(), {
                         post_id: this.issues[idx].id,
                         content: this.pre_reply,
-                        user_id: this.$cookies.get('userId'),
+                        user_id: this.$cookies.get('addingUsername'),
                     }, {headers: {Authorization: this.$cookies.get('JWT')}}
                 ).then(() => {
                     this.pre_reply = '';
                     this.quit();
+                    this.issues = null;
                     this.getIssues();
                 }).catch((error) => {
                     console.log(error);
