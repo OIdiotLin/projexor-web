@@ -3,6 +3,7 @@ node_js: stable
 branches:
   only:
   - master
+  - develop
 addons:
   ssh_known_hosts:
   - gz.oidiotlin.com
@@ -16,5 +17,8 @@ before_install:
 - eval "$(ssh-agent -s)"
 - chmod 600 travis
 - ssh-add travis
-after_success:
-- rsync -az --delete ./dist/* travis@gz.oidiotlin.com:/var/www/projexor-web/
+deploy:
+- provider: script
+  script: rsync -az --delete ./dist/* travis@gz.oidiotlin.com:/var/www/projexor-web/
+  on:
+    branch: master

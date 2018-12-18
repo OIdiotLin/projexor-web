@@ -31,18 +31,19 @@
                     <md-card-actions>
                         <md-button class="md-primary" :disabled="sending" v-on:click="loginStage=false">注册新用户
                         </md-button>
-                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="login">登录
+                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="login"
+                                   @click.prevent>登录
                         </md-button>
                     </md-card-actions>
 
-                    <md-snackbar :md-active.sync="loginSuccess"
-                                 :md-duration="4000" md-persistent>
-                        <span>登录成功！</span>
-                    </md-snackbar>
+                    <!--<md-snackbar :md-active.sync="loginOrRegisterFail"-->
+                    <!--:md-duration="3000" md-persistent>-->
+                    <!--<span>登录成功！</span>-->
+                    <!--</md-snackbar>-->
                 </md-card>
             </form>
 
-            <form novalidate v-if="!loginStage" ref="login-form" class="md-layout" @submit.prevent="login"
+            <form novalidate v-if="!loginStage" ref="register-form" class="md-layout" @submit.prevent="register"
                   method="post">
                 <md-card class="md-layout-item">
                     <md-card-header>
@@ -52,48 +53,58 @@
                     <md-card-content>
                         <md-field>
                             <label for="username">用户名</label>
-                            <md-input name="username" id="username" v-model="registForm.username"></md-input>
-                            <span class="md-error" v-if="!$v.registForm.username.required">请输入用户名</span>
+                            <md-input name="username" id="username" v-model="registerForm.username"></md-input>
+                            <span class="md-error" v-if="!$v.registerForm.username.required">请输入用户名</span>
                         </md-field>
 
                         <md-field>
                             <label for="email">电子邮箱</label>
-                            <md-input name="email" id="email" v-model="registForm.email"></md-input>
-                            <span class="md-error" v-if="!$v.registForm.email.email">请输入合法邮箱地址</span>
-                            <span class="md-error" v-if="!$v.registForm.email.required">请输入邮箱地址</span>
+                            <md-input name="email" id="email" v-model="registerForm.email"></md-input>
+                            <span class="md-error" v-if="!$v.registerForm.email.email">请输入合法邮箱地址</span>
+                            <span class="md-error" v-if="!$v.registerForm.email.required">请输入邮箱地址</span>
                         </md-field>
 
                         <md-field>
                             <label>密码</label>
-                            <md-input name="password" v-model="registForm.password"
+                            <md-input name="password" v-model="registerForm.password"
                                       type="password"></md-input>
-                            <span class="md-error" v-if="!$v.registForm.password.required">请输入密码</span>
+                            <span class="md-error" v-if="!$v.registerForm.password.required">请输入密码</span>
                         </md-field>
 
                     </md-card-content>
 
                     <md-card-actions>
                         <md-button class="md-primary" :disabled="sending" v-on:click="loginStage=true">我已有账户</md-button>
-                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="login">注册
+                        <md-button type="submit" class="md-primary" :disabled="sending" v-on:click="register"
+                                   @click.prevent>注册
                         </md-button>
                     </md-card-actions>
-
-                    <md-snackbar :md-active.sync="loginSuccess"
-                                 :md-duration="4000" md-persistent>
-                        <span>登录成功！</span>
-                    </md-snackbar>
                 </md-card>
             </form>
+
+            <md-snackbar :md-active.sync="loginOrRegisterFail"
+                         :md-duration="6000" md-persistent>
+                <span>{{loginStage ? "登录":"注册"}}失败！</span>
+            </md-snackbar>
+
+            <md-snackbar :md-active.sync="registerSuccess"
+                         :md-duration="6000" md-persistent>
+                <span>注册成功！</span>
+            </md-snackbar>
         </div>
     </div>
 </template>
 
 <script>
     // import Vue from 'vue';
-    // import axios from 'axios';
+    import axios from 'axios';
     import {validationMixin} from 'vuelidate';
     import {required, email} from 'vuelidate/lib/validators';
-    // import {api} from '../script/apis'
+    import {api} from '../script/apis'
+    import Vue from 'vue'
+    import VueCookies from 'vue-cookies'
+
+    Vue.use(VueCookies)
 
     import 'vue-material/dist/vue-material.min.css'
 
@@ -104,21 +115,23 @@
         mixins: [validationMixin],
         data() {
             return {
+                user: null,
+                token: null,
                 loginStage: true,
                 loginForm: {
                     account: null,
                     password: null
                 },
-                registForm: {
+                registerForm: {
                     username: null,
                     email: null,
                     password: null,
                 },
                 sending: false,
-                loginSuccess: false,
+                loginOrRegisterFail: false,
+                registerSuccess: false
             }
         },
-        // TODO : 完成表单的 validation
         validations: {
             loginForm: {
                 account: {
@@ -128,7 +141,7 @@
                     required,
                 }
             },
-            registForm: {
+            registerForm: {
                 username: {
                     required,
                 },
@@ -144,16 +157,47 @@
         methods: {
             login: function () {
                 this.sending = true;
-                setTimeout(() => {
-                    this.sending = false;
-                    this.loginSuccess = true;
+                var that = this;
 
-                    if (this.loginSuccess) {
-                        console.log('emit to listenToGoToPageEvent');
-                        this.$emit('listenToGoToPageEvent', 1);
-                    }
-                }, 1500);
-                // this.loginSuccess = false;
+                axios.post(api.login(), {
+                    username: this.loginForm.account,
+                    password: this.loginForm.password
+                })
+                    .then((response) => {
+                        this.user = response.data.user
+                        this.token = response.data.token
+                        this.$cookies.set('JWT', 'JWT ' + response.data.token);
+                        this.$cookies.set('addingUsername', this.user.id);
+                        this.$emit('listenToGetProjectsEvent', this.user.id, this.token)
+                        // this.$emit('listenToGoToPageEvent', 1)
+                    })
+                    .catch(function () {
+                        that.loginOrRegisterFail = true;
+                        that.sending = false
+                    })
+            },
+
+            register: function () {
+                this.sending = true;
+                var that = this;
+
+                axios.post(api.register(), {
+                    username: this.registerForm.username,
+                    email: this.registerForm.email,
+                    password: this.registerForm.password
+                })
+                    .then((response) => {
+                        that.sending = false;
+                        that.registerSuccess = true;
+                        that.loginStage = true;
+                        that.loginForm.account = response.data.username;
+                        that.loginForm.password = null;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        that.loginOrRegisterFail = true;
+                        that.sending = false
+                    })
             }
         }
     }
